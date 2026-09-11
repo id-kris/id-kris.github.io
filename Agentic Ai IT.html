@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agentic AI in IT Operations</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .infographic {
+            padding: 40px 20px;
+            background: #f8f9fa;
+        }
+        
+        .groups-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .group {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-top: 5px solid;
+        }
+        
+        .group:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        
+        .group.infrastructure {
+            border-top-color: #e74c3c;
+        }
+        
+        .group.security {
+            border-top-color: #f39c12;
+        }
+        
+        .group.service {
+            border-top-color: #27ae60;
+        }
+        
+        .group-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            margin: 0 auto 20px;
+        }
+        
+        .infrastructure .group-icon {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+        
+        .security .group-icon {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+        }
+        
+        .service .group-icon {
+            background: linear-gradient(135deg, #27ae60, #229954);
+        }
+        
+        .group h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            color: #2c3e50;
+        }
+        
+        .benefits {
+            list-style: none;
+        }
+        
+        .benefits li {
+            background: #f8f9fa;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid;
+            transition: all 0.3s ease;
+        }
+        
+        .infrastructure .benefits li {
+            border-left-color: #e74c3c;
+        }
+        
+        .security .benefits li {
+            border-left-color: #f39c12;
+        }
+        
+        .service .benefits li {
+            border-left-color: #27ae60;
+        }
+        
+        .benefits li:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+        
+        .benefits li::before {
+            content: "✓";
+            color: #27ae60;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .stats-section {
+            background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .stat {
+            padding: 20px;
+        }
+        
+        .stat-number {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #3498db;
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .footer {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .groups-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .intro-section {
+            padding: 40px 20px;
+            text-align: center;
+            background: white;
+        }
+        
+        .intro-section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 2rem;
+        }
+        
+        .intro-section p {
+            font-size: 1.1rem;
+            color: #555;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 Agentic AI in IT Operations</h1>
+            <p>Transforming IT Infrastructure Through Intelligent Automation</p>
+        </div>
+        
+        <div class="intro-section">
+            <h2>What is Agentic AI?</h2>
+            <p>Agentic AI represents autonomous systems that can make decisions, take actions, and solve problems independently. In IT operations, these intelligent agents can monitor, analyze, and respond to complex infrastructure challenges in real-time, dramatically improving efficiency and reliability.</p>
+        </div>
+        
+        <div class="infographic">
+            <h2 style="text-align: center; color: #2c3e50; margin-bottom: 20px; font-size: 2rem;">3 Key Areas of Enhancement</h2>
+            
+            <div class="groups-container">
+                <!-- Group 1: Infrastructure Management -->
+                <div class="group infrastructure">
+                    <div class="group-icon">🏗️</div>
+                    <h2>Infrastructure Management</h2>
+                    <ul class="benefits">
+                        <li><strong>Predictive Maintenance:</strong> AI agents predict hardware failures before they occur, reducing downtime by up to 70%</li>
+                        <li><strong>Auto-Scaling:</strong> Intelligent resource allocation based on real-time demand patterns and usage analytics</li>
+                        <li><strong>Performance Optimization:</strong> Continuous monitoring and automatic tuning of system parameters</li>
+                        <li><strong>Capacity Planning:</strong> Data-driven forecasting for infrastructure growth and resource requirements</li>
+                        <li><strong>Self-Healing Systems:</strong> Automated detection and resolution of common system problems</li>
+                    </ul>
+                </div>
+                
+                <!-- Group 2: Security Operations -->
+                <div class="group security">
+                    <div class="group-icon">🛡️</div>
+                    <h2>Security Operations</h2>
+                    <ul class="benefits">
+                        <li><strong>Autonomous SOC:</strong> AI-powered Security Operations Centers that can independently triage and investigate threats</li>
+                        <li><strong>Threat Detection:</strong> Real-time identification of anomalies and potential security breaches with faster response times</li>
+                        <li><strong>Incident Response:</strong> Automated containment and mitigation of security threats within minutes</li>
+                        <li><strong>Alert Triage:</strong> Intelligent prioritization and investigation of security alerts to reduce analyst fatigue</li>
+                        <li><strong>Threat Intelligence:</strong> Continuous monitoring of threat feeds with dynamic relevance criteria</li>
+                    </ul>
+                </div>
+                
+                <!-- Group 3: Service Management -->
+                <div class="group service">
+                    <div class="group-icon">⚙️</div>
+                    <h2>Service Management</h2>
+                    <ul class="benefits">
+                        <li><strong>Intelligent Ticketing:</strong> Automated categorization, routing, and resolution of IT support tickets</li>
+                        <li><strong>Root Cause Analysis:</strong> AI-powered investigation to identify underlying causes of issues with full context</li>
+                        <li><strong>Proactive Resolution:</strong> Transformation from reactive firefighting to proactive, autonomous remediation</li>
+                        <li><strong>Workflow Automation:</strong> Streamlining complex IT workflows by automating repetitive tasks</li>
+                        <li><strong>Real-time Insights:</strong> Surface key insights in real time for critical IT incident resolution</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stats-section">
+            <h2 style="margin-bottom: 30px; font-size: 2rem;">Expected Impact</h2>
+            <div class="stats-container">
+                <div class="stat">
+                    <div class="stat-number">75%</div>
+                    <div class="stat-label">Reduction in Manual Tasks</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">60%</div>
+                    <div class="stat-label">Faster Issue Resolution</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">70%</div>
+                    <div class="stat-label">Reduction in Downtime</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">99.9%</div>
+                    <div class="stat-label">System Uptime</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>© 2024 Agentic AI Solutions | Transforming IT Operations Through Intelligence</p>
+        </div>
+    </div>
+    
+    <script>
+        // Add some interactive effects
+        document.addEventListener('DOMContentLoaded', function() {
+            const groups = document.querySelectorAll('.group');
+            
+            groups.forEach(group => {
+                group.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-10px) scale(1.02)';
+                });
+                
+                group.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+            
+            // Animate stats on scroll
+            const stats = document.querySelectorAll('.stat-number');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const target = entry.target;
+                        const finalValue = target.textContent;
+                        target.textContent = '0';
+                        
+                        const increment = finalValue.includes('%') ? 
+                            parseInt(finalValue) / 50 : 
+                            parseFloat(finalValue) / 50;
+                        
+                        let current = 0;
+                        const timer = setInterval(() => {
+                            current += increment;
+                            if (current >= parseFloat(finalValue)) {
+                                target.textContent = finalValue;
+                                clearInterval(timer);
+                            } else {
+                                target.textContent = finalValue.includes('%') ? 
+                                    Math.floor(current) + '%' : 
+                                    current.toFixed(1);
+                            }
+                        }, 50);
+                    }
+                });
+            });
+            
+            stats.forEach(stat => observer.observe(stat));
+        });
+    </script>
+</body>
+</html>

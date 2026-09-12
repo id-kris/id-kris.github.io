@@ -1,1 +1,776 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daily Planner</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f1f5f9;
+      --card: #ffffff;
+      --border: #e2e8f0;
+      --text: #1e293b;
+      --muted: #94a3b8;
+      --blue: #3b82f6;
+      --blue-dark: #2563eb;
+      --blue-light: #eff6ff;
+      --emerald: #10b981;
+      --emerald-light: #ecfdf5;
+      --rose: #f43f5e;
+      --rose-light: #fff1f2;
+      --amber: #f59e0b;
+      --amber-light: #fffbeb;
+      --violet: #7c3aed;
+      --violet-light: #f5f3ff;
+      --shadow: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.05);
+      --shadow-md: 0 4px 6px rgba(0,0,0,.07), 0 2px 4px rgba(0,0,0,.06);
+      --shadow-lg: 0 10px 25px rgba(0,0,0,.12);
+      --radius: 14px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #f1f5f9 0%, #eff6ff 50%, #f1f5f9 100%);
+      min-height: 100vh;
+      color: var(--text);
+      padding: 24px 16px 100px;
+    }
+
+    .container { max-width: 680px; margin: 0 auto; }
+
+    /* ── Header Card ── */
+    .header-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .date-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .nav-btn {
+      width: 36px; height: 36px;
+      border: none; background: transparent; cursor: pointer;
+      border-radius: 10px; color: var(--muted);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; transition: background .15s, color .15s;
+    }
+    .nav-btn:hover { background: #f8fafc; color: var(--text); }
+    .date-center { text-align: center; }
+    .date-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 11px; font-weight: 700; color: var(--blue);
+      text-transform: uppercase; letter-spacing: .08em; margin-bottom: 2px;
+    }
+    .date-day { font-size: 24px; font-weight: 800; color: var(--text); line-height: 1.1; }
+    .date-full { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+    .jump-today {
+      display: flex; justify-content: center; margin-bottom: 12px;
+    }
+    .jump-btn {
+      background: var(--blue-light); color: var(--blue);
+      border: none; cursor: pointer; font-size: 12px; font-weight: 700;
+      padding: 6px 14px; border-radius: 999px; transition: background .15s;
+    }
+    .jump-btn:hover { background: #dbeafe; }
+
+    .focus-bar {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--amber-light); border: 1px solid #fde68a;
+      border-radius: 10px; padding: 10px 14px;
+    }
+    .focus-bar input {
+      flex: 1; border: none; background: transparent;
+      font-size: 13px; font-weight: 500; color: var(--text);
+      outline: none;
+    }
+    .focus-bar input::placeholder { color: var(--muted); }
+
+    /* ── Stats Bar ── */
+    .stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 14px; }
+    @media (max-width: 480px) { .stats { grid-template-columns: repeat(2,1fr); } }
+
+    .stat-card {
+      background: var(--card); border-radius: 12px;
+      border: 1px solid var(--border); padding: 12px;
+      box-shadow: var(--shadow);
+    }
+    .stat-label { font-size: 11px; color: var(--muted); font-weight: 600; margin-bottom: 2px; }
+    .stat-value { font-size: 22px; font-weight: 800; line-height: 1; }
+    .stat-blue   .stat-value { color: var(--blue); }
+    .stat-emerald .stat-value { color: var(--emerald); }
+    .stat-amber  .stat-value { color: var(--amber); }
+    .stat-progress { grid-column: span 1; }
+    @media (max-width: 480px) { .stat-progress { grid-column: span 2; } }
+
+    .progress-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+    .progress-label { font-size: 11px; font-weight: 700; color: var(--violet); }
+    .progress-pct { font-size: 16px; font-weight: 800; color: var(--violet); }
+    .progress-track {
+      height: 7px; background: #ede9fe; border-radius: 999px; overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%; background: linear-gradient(90deg, var(--violet), #a855f7);
+      border-radius: 999px; transition: width .5s cubic-bezier(.4,0,.2,1);
+    }
+    .stat-progress { background: var(--violet-light); border-color: #ddd6fe; }
+
+    /* ── Timeline ── */
+    .timeline-card {
+      background: var(--card); border-radius: var(--radius);
+      border: 1px solid var(--border); overflow: hidden; box-shadow: var(--shadow);
+    }
+    .timeline-header {
+      padding: 12px 16px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .timeline-header span:first-child { font-size: 13px; font-weight: 700; }
+    .timeline-header span:last-child { font-size: 12px; color: var(--muted); }
+
+    .time-row {
+      display: flex; gap: 10px; padding: 8px 16px;
+      border-bottom: 1px solid var(--border); transition: background .12s;
+    }
+    .time-row:last-child { border-bottom: none; }
+    .time-row:hover { background: #f8fafc; }
+    .time-row.is-now { background: var(--blue-light); }
+
+    .time-label {
+      width: 68px; flex-shrink: 0; padding-top: 6px;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .time-text { font-size: 11px; font-weight: 700; color: var(--muted); white-space: nowrap; }
+    .time-row.is-now .time-text { color: var(--blue); }
+    .now-dot {
+      width: 7px; height: 7px; background: var(--blue);
+      border-radius: 50%; animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50% { opacity: .5; transform: scale(1.4); }
+    }
+
+    .slot-tasks { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; padding: 2px 0; }
+
+    /* ── Task Card ── */
+    .task-card {
+      display: flex; align-items: flex-start; gap: 8px;
+      padding: 8px 10px; border-radius: 10px;
+      border-left: 3px solid transparent;
+      background: var(--card); box-shadow: var(--shadow);
+      transition: box-shadow .15s, opacity .15s;
+      position: relative;
+    }
+    .task-card:hover { box-shadow: var(--shadow-md); }
+    .task-card:hover .task-actions { opacity: 1; }
+    .task-card.done { opacity: .65; }
+
+    .task-card[data-cat="work"]     { border-left-color: var(--blue); }
+    .task-card[data-cat="personal"] { border-left-color: var(--emerald); }
+    .task-card[data-cat="health"]   { border-left-color: var(--rose); }
+    .task-card[data-cat="learning"] { border-left-color: var(--violet); }
+
+    .task-toggle {
+      margin-top: 1px; flex-shrink: 0;
+      background: none; border: none; cursor: pointer;
+      color: var(--muted); transition: color .15s; padding: 0;
+      line-height: 1;
+    }
+    .task-toggle:hover { color: var(--blue); }
+    .task-toggle.done-icon { color: var(--emerald); }
+
+    .task-body { flex: 1; min-width: 0; }
+    .task-title {
+      font-size: 13px; font-weight: 600; color: var(--text);
+      word-break: break-word; line-height: 1.3;
+    }
+    .task-card.done .task-title { text-decoration: line-through; color: var(--muted); }
+    .task-notes { font-size: 11px; color: var(--muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .task-badges { display: flex; align-items: center; gap: 5px; margin-top: 4px; flex-wrap: wrap; }
+    .badge {
+      font-size: 10px; font-weight: 700; padding: 2px 7px;
+      border-radius: 999px; text-transform: uppercase; letter-spacing: .05em;
+    }
+    .badge-work     { background: #dbeafe; color: var(--blue-dark); }
+    .badge-personal { background: #d1fae5; color: #065f46; }
+    .badge-health   { background: #ffe4e6; color: #be123c; }
+    .badge-learning { background: #ede9fe; color: var(--violet); }
+
+    .task-actions {
+      display: flex; align-items: center; gap: 2px;
+      opacity: 0; transition: opacity .15s; flex-shrink: 0;
+    }
+    .action-btn {
+      width: 26px; height: 26px; border: none; background: none; cursor: pointer;
+      border-radius: 6px; color: var(--muted); display: flex; align-items: center; justify-content: center;
+      transition: background .12s, color .12s;
+    }
+    .action-btn:hover { background: #f1f5f9; }
+    .action-btn.edit:hover  { color: var(--blue); background: var(--blue-light); }
+    .action-btn.delete:hover { color: var(--rose); background: var(--rose-light); }
+
+    /* ── Add-in-slot ── */
+    .add-inline {
+      display: flex; align-items: center; gap: 5px;
+      font-size: 12px; color: var(--muted); cursor: pointer;
+      background: none; border: none; padding: 3px 2px;
+      border-radius: 6px; transition: color .12s;
+      opacity: 0;
+    }
+    .time-row:hover .add-inline { opacity: 1; }
+    .add-inline:hover { color: var(--blue); }
+
+    /* ── FAB ── */
+    .fab {
+      position: fixed; bottom: 24px; right: 24px;
+      display: flex; align-items: center; gap: 8px;
+      background: var(--blue); color: #fff;
+      border: none; cursor: pointer;
+      padding: 14px 22px; border-radius: 999px;
+      font-size: 14px; font-weight: 700;
+      box-shadow: 0 4px 20px rgba(59,130,246,.45);
+      transition: background .15s, transform .1s, box-shadow .15s; z-index: 40;
+    }
+    .fab:hover { background: var(--blue-dark); box-shadow: 0 6px 24px rgba(59,130,246,.55); }
+    .fab:active { transform: scale(.96); }
+
+    /* ── Modal ── */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(15,23,42,.45);
+      backdrop-filter: blur(4px); z-index: 50;
+      display: flex; align-items: center; justify-content: center;
+      padding: 16px; opacity: 0; pointer-events: none;
+      transition: opacity .2s;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+
+    .modal {
+      background: var(--card); border-radius: 18px;
+      width: 100%; max-width: 440px;
+      box-shadow: var(--shadow-lg); padding: 24px;
+      transform: translateY(16px) scale(.98);
+      transition: transform .2s cubic-bezier(.34,1.56,.64,1);
+    }
+    .modal-overlay.open .modal { transform: translateY(0) scale(1); }
+
+    .modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .modal-title { font-size: 17px; font-weight: 800; }
+    .modal-close {
+      width: 32px; height: 32px; border: none; background: none; cursor: pointer;
+      border-radius: 8px; color: var(--muted);
+      display: flex; align-items: center; justify-content: center;
+      transition: background .12s, color .12s; font-size: 18px;
+    }
+    .modal-close:hover { background: #f1f5f9; color: var(--text); }
+
+    .form-group { margin-bottom: 16px; }
+    .form-label { display: block; font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 6px; }
+    .form-label span { color: var(--rose); font-weight: 400; }
+    .form-input {
+      width: 100%; padding: 10px 14px;
+      border: 1.5px solid var(--border); border-radius: 10px;
+      font-size: 13px; font-weight: 500; color: var(--text);
+      background: var(--card); outline: none;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .form-input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(59,130,246,.12); }
+    .form-input.error { border-color: var(--rose); box-shadow: 0 0 0 3px rgba(244,63,94,.12); background: var(--rose-light); }
+    .error-msg { font-size: 11px; color: var(--rose); margin-top: 4px; }
+
+    .cat-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }
+    .cat-btn {
+      padding: 8px 4px; border-radius: 10px;
+      border: 2px solid var(--border); background: #f8fafc;
+      font-size: 11px; font-weight: 700; cursor: pointer; text-align: center;
+      transition: all .12s; color: var(--muted);
+    }
+    .cat-btn[data-cat="work"].active     { background: #dbeafe; border-color: var(--blue); color: var(--blue-dark); }
+    .cat-btn[data-cat="personal"].active { background: #d1fae5; border-color: var(--emerald); color: #065f46; }
+    .cat-btn[data-cat="health"].active   { background: #ffe4e6; border-color: var(--rose); color: #be123c; }
+    .cat-btn[data-cat="learning"].active { background: #ede9fe; border-color: var(--violet); color: var(--violet); }
+
+    .modal-actions { display: flex; gap: 8px; margin-top: 20px; }
+    .btn-cancel {
+      flex: 1; padding: 11px; border: 1.5px solid var(--border);
+      border-radius: 10px; background: var(--card); cursor: pointer;
+      font-size: 13px; font-weight: 700; color: #64748b; transition: background .12s;
+    }
+    .btn-cancel:hover { background: #f8fafc; }
+    .btn-save {
+      flex: 1; padding: 11px; border: none;
+      border-radius: 10px; background: var(--blue); cursor: pointer;
+      font-size: 13px; font-weight: 700; color: #fff;
+      box-shadow: 0 2px 8px rgba(59,130,246,.35); transition: background .12s, transform .1s;
+    }
+    .btn-save:hover { background: var(--blue-dark); }
+    .btn-save:active { transform: scale(.97); }
+
+    /* ── Confirm delete ── */
+    .confirm-overlay {
+      position: fixed; inset: 0; background: rgba(15,23,42,.4);
+      z-index: 60; display: flex; align-items: center; justify-content: center; padding: 16px;
+      opacity: 0; pointer-events: none; transition: opacity .15s;
+    }
+    .confirm-overlay.open { opacity: 1; pointer-events: all; }
+    .confirm-box {
+      background: var(--card); border-radius: 14px; padding: 24px;
+      max-width: 320px; width: 100%; box-shadow: var(--shadow-lg); text-align: center;
+      transform: scale(.95); transition: transform .15s;
+    }
+    .confirm-overlay.open .confirm-box { transform: scale(1); }
+    .confirm-icon { font-size: 36px; margin-bottom: 8px; }
+    .confirm-title { font-size: 16px; font-weight: 800; margin-bottom: 6px; }
+    .confirm-msg { font-size: 13px; color: var(--muted); margin-bottom: 18px; }
+    .confirm-btns { display: flex; gap: 8px; }
+    .btn-no {
+      flex: 1; padding: 10px; border: 1.5px solid var(--border); border-radius: 10px;
+      background: var(--card); cursor: pointer; font-size: 13px; font-weight: 700; color: #64748b;
+    }
+    .btn-yes {
+      flex: 1; padding: 10px; border: none; border-radius: 10px;
+      background: var(--rose); cursor: pointer; font-size: 13px; font-weight: 700; color: #fff;
+    }
+
+    /* Empty slot hint */
+    .empty-hint { font-size: 12px; color: #cbd5e1; padding: 4px 0; font-style: italic; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <!-- Header -->
+  <div class="header-card">
+    <div class="date-nav">
+      <button class="nav-btn" id="prevDay">&#8249;</button>
+      <div class="date-center">
+        <div class="date-badge">📅 <span id="todayLabel">Today</span></div>
+        <div class="date-day" id="dayName"></div>
+        <div class="date-full" id="fullDate"></div>
+      </div>
+      <button class="nav-btn" id="nextDay">&#8250;</button>
+    </div>
+    <div class="jump-today" id="jumpWrap" style="display:none">
+      <button class="jump-btn" id="jumpToday">⬤ Jump to Today</button>
+    </div>
+    <div class="focus-bar">
+      <span>🎯</span>
+      <input type="text" id="focusInput" placeholder="Apa fokus utama kamu hari ini?" />
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat-card stat-blue">
+      <div class="stat-label">Total</div>
+      <div class="stat-value" id="statTotal">0</div>
+    </div>
+    <div class="stat-card stat-emerald">
+      <div class="stat-label">Selesai</div>
+      <div class="stat-value" id="statDone">0</div>
+    </div>
+    <div class="stat-card stat-amber">
+      <div class="stat-label">Sisa</div>
+      <div class="stat-value" id="statLeft">0</div>
+    </div>
+    <div class="stat-card stat-progress">
+      <div class="progress-header">
+        <span class="progress-label">⚡ Progres</span>
+        <span class="progress-pct" id="statPct">0%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progressFill" style="width:0%"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Timeline -->
+  <div class="timeline-card">
+    <div class="timeline-header">
+      <span>Jadwal Harian</span>
+      <span>— hover slot untuk tambah tugas</span>
+    </div>
+    <div id="timeline"></div>
+  </div>
+</div>
+
+<!-- FAB -->
+<button class="fab" id="fabAdd">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  Tambah Tugas
+</button>
+
+<!-- Add/Edit Modal -->
+<div class="modal-overlay" id="taskModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="modalTitle">Tambah Tugas</div>
+      <button class="modal-close" id="modalClose">&#10005;</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Judul Tugas <span>*</span></label>
+      <input class="form-input" id="fTitle" type="text" placeholder="Apa yang perlu dilakukan?" />
+      <div class="error-msg" id="fTitleErr" style="display:none">Judul tidak boleh kosong</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Waktu</label>
+      <select class="form-input" id="fHour"></select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Kategori</label>
+      <div class="cat-grid" id="catGrid">
+        <button class="cat-btn" data-cat="work">💼 Work</button>
+        <button class="cat-btn" data-cat="personal">🏠 Personal</button>
+        <button class="cat-btn" data-cat="health">❤️ Health</button>
+        <button class="cat-btn" data-cat="learning">📚 Learning</button>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Catatan <small style="text-transform:none;font-weight:400;color:var(--muted)">(opsional)</small></label>
+      <textarea class="form-input" id="fNotes" rows="2" placeholder="Detail tambahan..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" id="btnCancel">Batal</button>
+      <button class="btn-save" id="btnSave">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Delete -->
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <div class="confirm-icon">🗑️</div>
+    <div class="confirm-title">Hapus Tugas?</div>
+    <div class="confirm-msg" id="confirmMsg">Yakin ingin menghapus tugas ini?</div>
+    <div class="confirm-btns">
+      <button class="btn-no" id="confirmNo">Batal</button>
+      <button class="btn-yes" id="confirmYes">Hapus</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ─── State ───────────────────────────────────────────────────────────────────
+  const HOURS = Array.from({length: 17}, (_, i) => i + 6); // 6–22
+  const CATS = ['work','personal','health','learning'];
+  const CAT_LABELS = {work:'💼 Work', personal:'🏠 Personal', health:'❤️ Health', learning:'📚 Learning'};
+  const CAT_BADGE  = {work:'badge-work', personal:'badge-personal', health:'badge-health', learning:'badge-learning'};
+
+  let currentDate = new Date();
+  let tasksByDate = {};   // { 'YYYY-MM-DD': Task[] }
+  let focusByDate = {};   // { 'YYYY-MM-DD': string }
+  let idCounter   = 0;
+
+  // Modal state
+  let editingId   = null; // null = add mode
+  let selectedCat = 'work';
+  let pendingDeleteId = null;
+
+  // ─── Helpers ─────────────────────────────────────────────────────────────────
+  const $ = (id) => document.getElementById(id);
+  const dateKey = (d) => {
+    const y = d.getFullYear(), m = String(d.getMonth()+1).padStart(2,'0'), day = String(d.getDate()).padStart(2,'0');
+    return `${y}-${m}-${day}`;
+  };
+  const sameDay = (d1, d2) =>
+    d1.getFullYear()===d2.getFullYear() && d1.getMonth()===d2.getMonth() && d1.getDate()===d2.getDate();
+  const fmt = (d, opts) => d.toLocaleDateString('id-ID', opts);
+  const hourLabel = (h) => {
+    const p = h < 12 ? 'AM' : 'PM', dh = h === 0 ? 12 : h > 12 ? h-12 : h;
+    return `${dh}:00 ${p}`;
+  };
+  const newId = () => `t-${++idCounter}-${Date.now()}`;
+
+  const getTasks = () => tasksByDate[dateKey(currentDate)] ?? [];
+  const setTasks = (tasks) => { tasksByDate[dateKey(currentDate)] = tasks; };
+  const getFocus = () => focusByDate[dateKey(currentDate)] ?? '';
+  const setFocus = (v) => { focusByDate[dateKey(currentDate)] = v; };
+
+  // ─── Render Header ───────────────────────────────────────────────────────────
+  function renderHeader() {
+    const today = new Date();
+    const isToday = sameDay(currentDate, today);
+    $('todayLabel').textContent = isToday ? 'Hari Ini' : fmt(currentDate, {day:'numeric',month:'short',year:'numeric'});
+    $('dayName').textContent = fmt(currentDate, {weekday:'long'});
+    $('fullDate').textContent = fmt(currentDate, {day:'numeric',month:'long',year:'numeric'});
+    $('jumpWrap').style.display = isToday ? 'none' : 'flex';
+    $('focusInput').value = getFocus();
+  }
+
+  // ─── Render Stats ────────────────────────────────────────────────────────────
+  function renderStats() {
+    const tasks = getTasks();
+    const total = tasks.length;
+    const done = tasks.filter(t => t.done).length;
+    const left = total - done;
+    const pct = total > 0 ? Math.round(done/total*100) : 0;
+    $('statTotal').textContent = total;
+    $('statDone').textContent = done;
+    $('statLeft').textContent = left;
+    $('statPct').textContent = pct + '%';
+    $('progressFill').style.width = pct + '%';
+  }
+
+  // ─── Render Timeline ─────────────────────────────────────────────────────────
+  function renderTimeline() {
+    const tasks = getTasks();
+    const now = new Date();
+    const curHour = sameDay(currentDate, now) ? now.getHours() : -1;
+    const tl = $('timeline');
+    tl.innerHTML = '';
+
+    HOURS.forEach(h => {
+      const slotTasks = tasks.filter(t => t.hour === h);
+      const isNow = h === curHour;
+
+      const row = document.createElement('div');
+      row.className = 'time-row' + (isNow ? ' is-now' : '');
+
+      // Time label
+      const timeLabel = document.createElement('div');
+      timeLabel.className = 'time-label';
+      const timeText = document.createElement('span');
+      timeText.className = 'time-text';
+      timeText.textContent = hourLabel(h);
+      timeLabel.appendChild(timeText);
+      if (isNow) {
+        const dot = document.createElement('span');
+        dot.className = 'now-dot';
+        timeLabel.appendChild(dot);
+      }
+      row.appendChild(timeLabel);
+
+      // Slot tasks area
+      const slotDiv = document.createElement('div');
+      slotDiv.className = 'slot-tasks';
+
+      slotTasks.forEach(task => {
+        slotDiv.appendChild(buildTaskCard(task));
+      });
+
+      // Add inline button
+      const addBtn = document.createElement('button');
+      addBtn.className = 'add-inline';
+      addBtn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Tambah di ${hourLabel(h)}`;
+      addBtn.addEventListener('click', () => openModal(null, h));
+      slotDiv.appendChild(addBtn);
+
+      row.appendChild(slotDiv);
+      tl.appendChild(row);
+    });
+  }
+
+  function buildTaskCard(task) {
+    const card = document.createElement('div');
+    card.className = 'task-card' + (task.done ? ' done' : '');
+    card.dataset.cat = task.category;
+
+    // Toggle button
+    const toggle = document.createElement('button');
+    toggle.className = 'task-toggle' + (task.done ? ' done-icon' : '');
+    toggle.title = task.done ? 'Tandai belum selesai' : 'Tandai selesai';
+    toggle.innerHTML = task.done
+      ? `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`
+      : `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>`;
+    toggle.addEventListener('click', () => { toggleTask(task.id); });
+    card.appendChild(toggle);
+
+    // Body
+    const body = document.createElement('div');
+    body.className = 'task-body';
+    const title = document.createElement('div');
+    title.className = 'task-title';
+    title.textContent = task.title;
+    body.appendChild(title);
+
+    if (task.notes) {
+      const notes = document.createElement('div');
+      notes.className = 'task-notes';
+      notes.textContent = task.notes;
+      body.appendChild(notes);
+    }
+
+    const badges = document.createElement('div');
+    badges.className = 'task-badges';
+    const badge = document.createElement('span');
+    badge.className = `badge ${CAT_BADGE[task.category]}`;
+    badge.textContent = CAT_LABELS[task.category];
+    badges.appendChild(badge);
+    body.appendChild(badges);
+    card.appendChild(body);
+
+    // Actions
+    const actions = document.createElement('div');
+    actions.className = 'task-actions';
+
+    const editBtn = document.createElement('button');
+    editBtn.className = 'action-btn edit';
+    editBtn.title = 'Edit';
+    editBtn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`;
+    editBtn.addEventListener('click', () => openModal(task));
+    actions.appendChild(editBtn);
+
+    const delBtn = document.createElement('button');
+    delBtn.className = 'action-btn delete';
+    delBtn.title = 'Hapus';
+    delBtn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>`;
+    delBtn.addEventListener('click', () => confirmDelete(task.id, task.title));
+    actions.appendChild(delBtn);
+
+    card.appendChild(actions);
+    return card;
+  }
+
+  // ─── Full Render ─────────────────────────────────────────────────────────────
+  function render() {
+    renderHeader();
+    renderStats();
+    renderTimeline();
+  }
+
+  // ─── Task Operations ──────────────────────────────────────────────────────────
+  function toggleTask(id) {
+    setTasks(getTasks().map(t => t.id === id ? {...t, done: !t.done} : t));
+    render();
+  }
+  function deleteTask(id) {
+    setTasks(getTasks().filter(t => t.id !== id));
+    render();
+  }
+
+  // ─── Modal ───────────────────────────────────────────────────────────────────
+  function openModal(task = null, defaultHour = 9) {
+    editingId = task ? task.id : null;
+    $('modalTitle').textContent = task ? 'Edit Tugas' : 'Tambah Tugas';
+    $('fTitle').value = task ? task.title : '';
+    $('fNotes').value = task ? (task.notes || '') : '';
+    $('fTitleErr').style.display = 'none';
+    $('fTitle').classList.remove('error');
+
+    // Populate hour select
+    const sel = $('fHour');
+    sel.innerHTML = '';
+    HOURS.forEach(h => {
+      const opt = document.createElement('option');
+      opt.value = h;
+      opt.textContent = hourLabel(h);
+      if (h === (task ? task.hour : defaultHour)) opt.selected = true;
+      sel.appendChild(opt);
+    });
+
+    // Category
+    selectedCat = task ? task.category : 'work';
+    renderCatGrid();
+
+    $('taskModal').classList.add('open');
+    setTimeout(() => $('fTitle').focus(), 150);
+  }
+
+  function closeModal() {
+    $('taskModal').classList.remove('open');
+    editingId = null;
+  }
+
+  function renderCatGrid() {
+    document.querySelectorAll('.cat-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.cat === selectedCat);
+    });
+  }
+
+  function saveTask() {
+    const title = $('fTitle').value.trim();
+    if (!title) {
+      $('fTitle').classList.add('error');
+      $('fTitleErr').style.display = 'block';
+      $('fTitle').focus();
+      return;
+    }
+    const hour = parseInt($('fHour').value);
+    const notes = $('fNotes').value.trim();
+
+    if (editingId) {
+      setTasks(getTasks().map(t =>
+        t.id === editingId
+          ? {...t, title, hour, category: selectedCat, notes: notes || undefined}
+          : t
+      ));
+    } else {
+      const newTask = {id: newId(), title, hour, category: selectedCat, notes: notes || undefined, done: false};
+      setTasks([...getTasks(), newTask]);
+    }
+    closeModal();
+    render();
+  }
+
+  // ─── Confirm Delete ───────────────────────────────────────────────────────────
+  function confirmDelete(id, title) {
+    pendingDeleteId = id;
+    $('confirmMsg').textContent = `Yakin ingin menghapus "${title}"?`;
+    $('confirmOverlay').classList.add('open');
+  }
+  function closeConfirm() {
+    $('confirmOverlay').classList.remove('open');
+    pendingDeleteId = null;
+  }
+
+  // ─── Event Listeners ──────────────────────────────────────────────────────────
+  $('prevDay').addEventListener('click', () => {
+    currentDate = new Date(currentDate.getTime() - 86400000);
+    render();
+  });
+  $('nextDay').addEventListener('click', () => {
+    currentDate = new Date(currentDate.getTime() + 86400000);
+    render();
+  });
+  $('jumpToday').addEventListener('click', () => {
+    currentDate = new Date();
+    render();
+  });
+  $('focusInput').addEventListener('input', e => setFocus(e.target.value));
+  $('fabAdd').addEventListener('click', () => openModal());
+  $('modalClose').addEventListener('click', closeModal);
+  $('btnCancel').addEventListener('click', closeModal);
+  $('btnSave').addEventListener('click', saveTask);
+  $('confirmNo').addEventListener('click', closeConfirm);
+  $('confirmYes').addEventListener('click', () => {
+    if (pendingDeleteId) deleteTask(pendingDeleteId);
+    closeConfirm();
+  });
+
+  // Close modal on overlay click
+  $('taskModal').addEventListener('click', e => { if (e.target === $('taskModal')) closeModal(); });
+  $('confirmOverlay').addEventListener('click', e => { if (e.target === $('confirmOverlay')) closeConfirm(); });
+
+  // Category selection
+  document.querySelectorAll('.cat-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      selectedCat = btn.dataset.cat;
+      renderCatGrid();
+    });
+  });
+
+  // Keyboard shortcuts
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      closeModal();
+      closeConfirm();
+    }
+    if (e.key === 'Enter' && $('taskModal').classList.contains('open')) {
+      if (document.activeElement !== $('fNotes')) saveTask();
+    }
+  });
+
+  // ─── Init ─────────────────────────────────────────────────────────────────────
+  render();
+</script>
+</body>
+</html>
 
